@@ -1,5 +1,5 @@
 (function() {
-  const appendChild = (element, child) => {
+  const appendChild = (element, child, index) => {
     if (typeof child === 'string' || typeof child === 'number') {
       const textNode = document.createTextNode(child);
       return element.appendChild(textNode);
@@ -10,18 +10,23 @@
     }
 
     if (typeof child === 'function') {
-      return element.appendChild(child());
+      const render = () => {
+        element.replaceChild(child(render), element.childNodes[index]);
+      };
+      return element.appendChild(child(render));
     }
   };
 
-  const appendChildren = (element, children) => {
+  const appendChildren = (element, children, prevIndex) => {
+    let index = prevIndex || -1;
     if (Array.isArray(children)) {
       return children.map(child => {
-        return appendChildren(element, child);
+        index++;
+        return appendChildren(element, child, index);
       });
     }
 
-    return appendChild(element, children);
+    return appendChild(element, children, index);
   };
 
   const createRoot = node => {
@@ -47,11 +52,6 @@
     const element = createRoot(node);
 
     const render = (children, props) => {
-      if (!node) {
-        // Hack for fragments
-        return appendChildren({ appendChild: e => e }, children);
-      }
-
       element.innerHTML = '';
 
       if (children !== undefined) {
@@ -66,5 +66,12 @@
     };
 
     return render;
+  };
+
+  // Fragment Hack
+  window.createFragment = () => {
+    return children => {
+      return appendChildren({ appendChild: e => e }, children);
+    };
   };
 })();

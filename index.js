@@ -1,96 +1,55 @@
-// const Copy = value => render("p", value);
+const withState = (propName, updaterName, initialState) => Component => () => {
+  let state = initialState;
 
-// const Title = render("h1", "Hello World!");
+  const renderer = createNode('div');
 
-// const Tabs = tabs => {
-//   const CurrentTabNode = render("div", tabs[0]);
+  const render = () =>
+    renderer(
+      Component({
+        [propName]: state,
+        [updaterName]: updater
+      })
+    );
 
-//   const Menu = render(
-//     "div",
-//     tabs.map((_, key) => {
-//       return render("button", `Tab ${key}`, {
-//         onClick: () => {
-//           render(CurrentTabNode, tabs[key]);
-//         }
-//       });
-//     })
-//   );
+  const updater = value => {
+    state = value;
+    render();
+  };
 
-//   return [Menu, CurrentTabNode];
-// };
+  return render();
+};
 
-// const Carousel = items => {
-//   const slides = items.map(item => {
-//     return render("div", item, {
-//       class: "carousel__item"
-//     });
-//   });
+const Foo = ({ setCount, count }) => {
+  return createNode('p')(count, {
+    onClick: () => {
+      setCount(count + 1);
+    }
+  });
+};
 
-//   const track = render("div", slides, {
-//     class: "carousel__track"
-//   });
-
-//   const reRenderTrack = index => {
-//     render(track, slides, {
-//       class: "carousel__track",
-//       style: `transform: translateX(-${index * 100}%)`
-//     });
-//   };
-
-//   let index = 0;
-//   return render("div", track, {
-//     class: "carousel",
-//     onClick: () => {
-//       index = ++index % (items.length - 1);
-//       reRenderTrack(index);
-//     }
-//   });
-// };
-
-// const Shop = () => {
-//   const el = render("div");
-
-//   fetch("https://j-parre.myshopify.com/products.json")
-//     .then(d => d.json())
-//     .then(({ products }) => {
-//       const items = products.map(product => {
-//         return render("div", [render("p", product.title)]);
-//       });
-
-//       render(el, items);
-//     });
-
-//   return el;
-// };
-
-// const App = render("div", [
-//   Title,
-//   Copy("Wow it works 123"),
-//   render("p", "nice one"),
-//   Tabs([render("p", "Tab 1"), render("p", "Tab 2"), render("p", "Tab 3")]),
-//   Carousel(
-//     Array.from(Array(10)).map((_, key) => {
-//       return render("img", null, {
-//         src: `https://picsum.photos/500/300?${key}`
-//       });
-//     })
-//   ),
-//   Shop()
-// ]);
+const Thing = withState('count', 'setCount', 0)(Foo);
 
 const Wow = () => {
   return createNode('h2')('Nice one!');
 };
 
 const Form = () => {
-  return createNode('form')([
-    createNode('input'),
-    createNode('input'),
-    createNode('input'),
-    createNode('input'),
-    createNode('button')('nice', { type: 'submit' }),
-    createNode(null)(Wow())
-  ]);
+  return createNode('form')(
+    [
+      createNode('input')(),
+      createNode('input')(),
+      createNode('input')(),
+      createNode('input')(),
+      createNode('button')('nice', { type: 'submit' }),
+      Wow
+    ],
+    {
+      onSubmit: e => {
+        e.preventDefault();
+        console.log(e.target);
+      }
+    }
+  );
 };
 
 const ShowCount = ({ count }) => {
@@ -121,7 +80,43 @@ const Test = () => {
   return render();
 };
 
-const App = createNode('div')([Test, Test, Test, Test, Test, Test]);
+let state = 0;
+const NewTing = render => {
+  const onClick = () => {
+    state = state + 1;
+    render();
+  };
+
+  return state > 10 ? Form() : createNode('h2')(state, { onClick });
+};
+
+let wow = 0;
+const Ting = render => {
+  const onClick = () => {
+    wow = wow + 1;
+    render();
+  };
+
+  return createFragment()(
+    createNode('h1')(`shit head! ${wow}`, {
+      onClick
+    })
+  );
+};
+
+const App = createNode('div')([
+  Test,
+  Test,
+  Test,
+  Test,
+  Test,
+  Test,
+  Thing,
+  Test,
+  Form,
+  NewTing,
+  Ting
+]);
 
 const main = document.getElementById('main');
 createNode(main)(App);
