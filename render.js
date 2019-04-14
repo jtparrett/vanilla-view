@@ -1,24 +1,26 @@
 (function() {
-  const appendChild = (element, child, index) => {
+  const createChild = child => {
     if (typeof child === 'string' || typeof child === 'number') {
-      const textNode = document.createTextNode(child);
-      return element.appendChild(textNode);
+      return document.createTextNode(child);
     }
 
     if (child instanceof Node) {
-      return element.appendChild(child);
+      return child;
     }
+  };
 
-    if (typeof child === 'function') {
-      const render = () => {
-        element.replaceChild(child(render), element.childNodes[index]);
-      };
-      return element.appendChild(child(render));
-    }
+  const createRenderer = (element, children, index) => {
+    const render = () => {
+      const node = createChild(children(render));
+      element.replaceChild(node, element.childNodes[index]);
+    };
+
+    return render;
   };
 
   const appendChildren = (element, children, prevIndex) => {
     let index = prevIndex || -1;
+
     if (Array.isArray(children)) {
       return children.map(child => {
         index++;
@@ -26,7 +28,13 @@
       });
     }
 
-    return appendChild(element, children, index);
+    if (typeof children === 'function') {
+      const render = createRenderer(element, children, index);
+      return appendChildren(element, children(render), index);
+    }
+
+    const node = createChild(children);
+    return element.appendChild(node);
   };
 
   const createRoot = node => {
@@ -48,24 +56,20 @@
     });
   };
 
-  window.createNode = node => {
+  window.createNode = (node, children, props) => {
     const element = createRoot(node);
 
-    const render = (children, props) => {
-      element.innerHTML = '';
+    element.innerHTML = '';
 
-      if (children !== undefined) {
-        appendChildren(element, children);
-      }
+    if (children !== undefined) {
+      appendChildren(element, children);
+    }
 
-      if (props) {
-        assignProps(element, props);
-      }
+    if (props) {
+      assignProps(element, props);
+    }
 
-      return element;
-    };
-
-    return render;
+    return element;
   };
 
   // Fragment Hack

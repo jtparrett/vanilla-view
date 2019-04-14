@@ -1,46 +1,16 @@
-const withState = (propName, updaterName, initialState) => Component => () => {
-  let state = initialState;
-
-  const renderer = createNode('div');
-
-  const render = () =>
-    renderer(
-      Component({
-        [propName]: state,
-        [updaterName]: updater
-      })
-    );
-
-  const updater = value => {
-    state = value;
-    render();
-  };
-
-  return render();
-};
-
-const Foo = ({ setCount, count }) => {
-  return createNode('p')(count, {
-    onClick: () => {
-      setCount(count + 1);
-    }
-  });
-};
-
-const Thing = withState('count', 'setCount', 0)(Foo);
-
 const Wow = () => {
-  return createNode('h2')('Nice one!');
+  return createNode('h2', 'Nice one!');
 };
 
-const Form = () => {
-  return createNode('form')(
+const Form = () =>
+  createNode(
+    'form',
     [
-      createNode('input')(),
-      createNode('input')(),
-      createNode('input')(),
-      createNode('input')(),
-      createNode('button')('nice', { type: 'submit' }),
+      createNode('input'),
+      createNode('input'),
+      createNode('input'),
+      createNode('input'),
+      createNode('button', 'nice', { type: 'submit' }),
       Wow
     ],
     {
@@ -50,68 +20,61 @@ const Form = () => {
       }
     }
   );
-};
 
-const ShowCount = ({ count }) => {
-  return createNode('h1')(`Count: ${count}`);
-};
+const ShowCount = ({ count }) => createNode('h1', `Count: ${count}`);
 
 const Test = () => {
   let count = 0;
-  const renderer = createNode('div');
 
-  const render = () => renderer(child({ count }));
+  return render => {
+    const onClick = () => {
+      count = count + 1;
+      render();
+    };
 
-  const onClick = () => {
-    count = count + 1;
-    render();
-
-    if (count > 10) {
-      renderer(Form);
-    }
-  };
-
-  const child = props => {
-    return createNode('div')(ShowCount(props), {
+    return createNode('div', ShowCount({ count }), {
       onClick
     });
   };
-
-  return render();
 };
 
-let state = 0;
-const NewTing = render => {
-  const onClick = () => {
-    state = state + 1;
-    render();
+const NewTing = () => {
+  let state = 0;
+
+  return render => {
+    const onClick = () => {
+      state = state + 1;
+      render();
+    };
+
+    return state > 10 ? Form() : createNode('h2', state, { onClick });
   };
-
-  return state > 10 ? Form() : createNode('h2')(state, { onClick });
 };
 
-let wow = 0;
-const Ting = render => {
-  const onClick = () => {
-    wow = wow + 1;
-    render();
+const Ting = () => {
+  let count = 0;
+
+  return render => {
+    const onClick = () => {
+      count = count + 1;
+      render();
+    };
+
+    return createFragment()(
+      createNode('h1', `Fragment test! ${count}`, {
+        onClick
+      })
+    );
   };
-
-  return createFragment()(
-    createNode('h1')(`shit head! ${wow}`, {
-      onClick
-    })
-  );
 };
 
-const App = createNode('div')([
+const App = createNode('div', [
   Test,
   Test,
   Test,
   Test,
   Test,
   Test,
-  Thing,
   Test,
   Form,
   NewTing,
@@ -119,4 +82,4 @@ const App = createNode('div')([
 ]);
 
 const main = document.getElementById('main');
-createNode(main)(App);
+createNode(main, App);
