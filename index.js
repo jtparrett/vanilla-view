@@ -60,7 +60,7 @@ const Ting = () => {
       render();
     };
 
-    return createFragment()(
+    return createFragment(
       createNode('h1', `Fragment test! ${count}`, {
         onClick
       })

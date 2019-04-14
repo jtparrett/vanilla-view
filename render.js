@@ -73,9 +73,7 @@
   };
 
   // Fragment Hack
-  window.createFragment = () => {
-    return children => {
-      return appendChildren({ appendChild: e => e }, children);
-    };
+  window.createFragment = children => {
+    return appendChildren({ appendChild: e => e }, children);
   };
 })();
