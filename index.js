@@ -1,27 +1,26 @@
 const Wow = () => {
-  return createNode('h2', 'Nice one!');
+  return createNode('h2', null, 'Nice one!');
 };
 
 const Form = () =>
   createNode(
     'form',
-    [
-      createNode('input'),
-      createNode('input'),
-      createNode('input'),
-      createNode('input'),
-      createNode('button', 'nice', { type: 'submit' }),
-      Wow
-    ],
     {
       onSubmit: e => {
         e.preventDefault();
         console.log(e.target);
       }
-    }
+    },
+    createNode('input'),
+    createNode('input'),
+    createNode('input'),
+    createNode('input'),
+    createNode('button', { type: 'submit' }, 'nice'),
+    Wow,
+    NewTing
   );
 
-const ShowCount = ({ count }) => createNode('h1', `Count: ${count}`);
+const ShowCount = ({ count }) => createNode('h1', null, `Count: ${count}`);
 
 const Test = () => {
   let count = 0;
@@ -32,9 +31,7 @@ const Test = () => {
       render();
     };
 
-    return createNode('div', ShowCount({ count }), {
-      onClick
-    });
+    return createNode('div', { onClick }, ShowCount({ count }));
   };
 };
 
@@ -47,7 +44,7 @@ const NewTing = () => {
       render();
     };
 
-    return state > 10 ? Form() : createNode('h2', state, { onClick });
+    return state > 10 ? Form() : createNode('h2', { onClick }, state);
   };
 };
 
@@ -60,15 +57,13 @@ const Ting = () => {
       render();
     };
 
-    return createFragment(
-      createNode('h1', `Fragment test! ${count}`, {
-        onClick
-      })
-    );
+    return createNode('h1', { onClick }, `Fragment test! ${count}`);
   };
 };
 
-const App = createNode('div', [
+const App = createNode(
+  'div',
+  null,
   Test,
   Test,
   Test,
@@ -79,7 +74,7 @@ const App = createNode('div', [
   Form,
   NewTing,
   Ting
-]);
+);
 
 const main = document.getElementById('main');
-createNode(main, App);
+createNode(main, null, App);

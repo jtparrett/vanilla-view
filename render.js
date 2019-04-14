@@ -19,12 +19,11 @@
   };
 
   const appendChildren = (element, children, prevIndex) => {
-    let index = prevIndex || -1;
+    let index = prevIndex || 0;
 
     if (Array.isArray(children)) {
-      return children.map(child => {
-        index++;
-        return appendChildren(element, child, index);
+      return children.map((child, i) => {
+        return appendChildren(element, child, index + i);
       });
     }
 
@@ -56,7 +55,7 @@
     });
   };
 
-  window.createNode = (node, children, props) => {
+  window.createNode = (node, props, ...children) => {
     const element = createRoot(node);
 
     element.innerHTML = '';
@@ -70,10 +69,5 @@
     }
 
     return element;
-  };
-
-  // Fragment Hack
-  window.createFragment = children => {
-    return appendChildren({ appendChild: e => e }, children);
   };
 })();
