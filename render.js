@@ -56,6 +56,10 @@
   };
 
   window.createNode = (node, props, ...children) => {
+    if (typeof node === 'function') {
+      return node({ children, ...props });
+    }
+
     const element = createRoot(node);
 
     element.innerHTML = '';
